@@ -1,0 +1,6 @@
+include("rosenbrock.jl")
+include("edensch.jl")
+include("fletchcr.jl")
+include("liarwhd.jl")
+include("nonscomp.jl")
+include("eg2.jl")
