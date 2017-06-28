@@ -16,8 +16,12 @@ This implementation has been tested on Julia 0.4.6. We demonstrate ```pmbsolve``
 
 ## PMBSolve for Python
 
-Coming soon with a simple **machine learning** example using **logistic regression**.
+_COMING SOON_
+
+An implementation in [scipy.optimize](https://docs.scipy.org/doc/scipy/reference/optimize.html) and an implementation as a stand-alone method. We also present a simple **machine learning** example using **logistic regression**.
 
 ## PMBSolve for C++11
 
-Coming soon with a **shared-memory implementation** of a **matrix factorization** example on a movie recommendation data set.
+_COMING SOON_
+
+A **shared-memory implementation** of ```pmbsolve``` with a large-scale **matrix factorization** example on a movie recommendation data set.
