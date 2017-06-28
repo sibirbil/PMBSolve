@@ -6,6 +6,8 @@ min f(x),
 ```
 where f is a differentiable real-valued function defined on n-dimensional Euclidean space. Below, we have implementations for various programming languages.
 
+The details of the algorithm is given in the arXiv paper by [Oztoprak and Birbil, 2017](https://arxiv.org/abs/1705.05158). This paper soon to be published in [Optimization](http://www.tandfonline.com/loi/gopt20) after minor modifications. 
+
 ## PMBSolve for Octave/MATLAB
 
 This implementation has been tested on Octave 4.2.1 and MATLAB 2105b. In addition to basic usage on several test functions, we also present a **matrix factorization** example on a movie recommendation data set. Here is the [notebook](octave_matlab/PMBSolve_for_Octave_MATLAB.ipynb).
