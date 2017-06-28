@@ -1,10 +1,10 @@
 # Preconditioned Model Building Solver (PMBSolve)
 
 PMBSolve is an optimization solver for solving unconstrained problems of the form
-$$
+```math
 \underset{x \in \mathbb{R}^n}{\min} f(x),
-$$
-where $f: \mathbb{R}^n \mapsto \mathbb{R}$ is a differentiable function. Below, we have implementations for various programming languages.
+```
+where $`f: \mathbb{R}^n \mapsto \mathbb{R}`$ is a differentiable function. Below, we have implementations for various programming languages.
 
 ## PMBSolve for Octave/MATLAB
 
