@@ -7,7 +7,7 @@ min f(x),
 where f is a differentiable real-valued function defined on n-dimensional Euclidean space.
 The details of the algorithm is given in the arXiv paper by [Oztoprak and Birbil, 2017](https://arxiv.org/abs/1705.05158). This paper soon to be published in [Optimization](http://www.tandfonline.com/loi/gopt20) after minor modifications.
 
-Below, we have implementations for various programming languages. We have used the L-BFGS approach for preconditioning the initial trial step. We also note that for the preconditioning method (```precond```), we have inspired by the wonderful [minFunc](http://www.cs.ubc.ca/~schmidtm/Software/minFunc.html) package of [Mark Schmidt](http://www.cs.ubc.ca/~schmidtm/). 
+Below, we have implementations for various programming languages. We have used the L-BFGS approach for preconditioning the initial trial step. Our implementation of the preconditioning method (```precond```) borrows heavily from the wonderful [minFunc](http://www.cs.ubc.ca/~schmidtm/Software/minFunc.html) package of [Mark Schmidt](http://www.cs.ubc.ca/~schmidtm/).
 
 
 ## PMBSolve for Octave/MATLAB
