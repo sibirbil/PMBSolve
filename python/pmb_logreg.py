@@ -57,7 +57,7 @@ res = minimize(logreg, theta_0, args=(X,y,100), jac=logreg_deriv, method=pmbsolv
                options={"eta":0.1})
 
 # Test the predictor
-# Load the test data
+# Load the test data (not included in Github -- see the note at the beginning)
 test = np.loadtxt("data/mnist_test.csv",delimiter=",")
 Xtest = np.copy(test)/test.max()
 Xtest[:,0] = np.ones(Xtest.shape[0])
