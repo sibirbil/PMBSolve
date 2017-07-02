@@ -11,6 +11,13 @@ Created on Wed Jun 14 21:13:34 2017
 # too large so that exp overflows. The sigmoid h becomes 1, and log(h) becomes 0.
 # We rewrite the objective function such that we avoid a zero argument to log.
 # Also, we rescale the input by the range of the data.
+
+# The MNIST data files in CSV form are downloaded from:
+# https://pjreddie.com/projects/mnist-in-csv/
+
+# The files exceed GitHub's file size limit. Please download them to your
+# computer separately to run the code.
+
 import numpy as np
 from pmb_scipy import pmbsolve
 from scipy.optimize import minimize
