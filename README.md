@@ -20,7 +20,7 @@ This implementation has been tested on Julia 0.4.6. We demonstrate ```pmbsolve``
 
 ## PMBSolve for Python
 
-An implementation in [scipy.optimize](https://docs.scipy.org/doc/scipy/reference/optimize.html) and an implementation as a stand-alone method. We also present a simple **machine learning** example using **logistic regression**. Here is [the notebook](python/Comparison_of_PMB_and_other_optimizers_in_SciPy_with_10K_dim_Rosenbrock.ipynb).
+An implementation in [scipy.optimize](https://docs.scipy.org/doc/scipy/reference/optimize.html) and an implementation as a stand-alone method. We also present a simple **machine learning** example using **logistic regression**. Here is [the notebook](python/PMBSolve_for_Python.ipynb).
 
 ## PMBSolve for C++11
 
