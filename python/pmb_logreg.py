@@ -53,8 +53,7 @@ m, n = X.shape
 theta_0 = np.random.randn(n)
 
 #res = minimize(logreg, theta_0, args=(X,y,1), jac=logreg_deriv, method="L-BFGS-B")
-res = minimize(logreg, theta_0, args=(X,y,100), jac=logreg_deriv, method=pmbsolve,
-               options={"eta":0.1})
+res = minimize(logreg, theta_0, args=(X,y,1), jac=logreg_deriv, method=pmbsolve)
 
 # Test the predictor
 # Load the test data (not included in Github -- see the note at the beginning)
