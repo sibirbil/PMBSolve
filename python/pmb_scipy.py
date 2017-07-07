@@ -101,7 +101,7 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
     
     x = x_0
     f = fun(x,*args)
-    fk = f  # to check stopping condition
+    fold = np.inf  # to check stopping condition
     g = jac(x,*args)
     fcalls += 1
     
@@ -138,14 +138,15 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
             break
         if maxtime > 0 and time()-tstart >= maxtime:
             exitcode = "Maximum time limit (maxtime) is reached."
+            break
         if ngf < gtol:
             exitcode = "Gradient norm converged to zero within gtol."
             break
-        if iteration > 1 and (fk-f)/max((abs(fk),abs(f),1)) < ftol:
-            exitcode = "Converged to the minimum function value within ftol."  
+        if iteration > 1 and (fold-f)/max((abs(fold),abs(f),1)) < ftol:
+            exitcode = "Function value decreases less than ftol."
             break
         else:
-            fk = f
+            fold = f
         # end stopping conditions
         
         if keephistory:
@@ -176,7 +177,7 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
                 break
             sgt = np.dot(s,gt)
             y = gt - g  # y^k_t
-            ys = np.dot(y,s) # v1
+            ys = sgt - sg # v1
             ss = np.dot(s,s) # v2
             yy = np.dot(y,y) # v3
             yg = np.dot(y,g) # v4
@@ -194,6 +195,7 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
                 eta2 = 1.0
             eta = min(eta1, eta2)/(eta1+eta2)
             # end guess eta
+            
             sigma = 0.5*(np.sqrt(ss)*(np.sqrt(yy)+np.sqrt(gg)/eta)-ys)
             theta = (ys + 2*sigma)**2 - ss*yy
             cg = -ss/(2*sigma) # cg(sigma)

@@ -30,7 +30,12 @@ def logreg(theta, *args):
     m = args[0].shape[0]
     lam = args[2] # regularization parameter
     z = np.dot(args[0],theta)
-    J = sum(z + np.log(1+np.exp(-z))) - np.dot(z,args[1])
+    try:
+        J = sum(z + np.log(1+np.exp(-z))) - np.dot(z,args[1])
+    except RuntimeWarning: # overflow in exp(-z)
+        # Use the limit: log(1 + exp(-z)) -> -z as z -> -inf
+        J = -np.dot(z,args[1])
+        
     J += 0.5*lam*np.dot(theta[1:],theta[1:])
     return J/m
 
@@ -38,10 +43,15 @@ def logreg_deriv(theta, *args):
     # args = (X,y,lambda)
     lam = args[2]
     z = np.dot(args[0],theta)
-    grad = np.dot(args[0].transpose(), 1/(1+np.exp(-z)) - y)
+    try:
+        grad = np.dot(args[0].transpose(), 1/(1+np.exp(-z)) - y)
+    except RuntimeWarning:# overflow in exp(-z)
+        # Use the limit 1/(1 + exp(-z)) -> 0 as z -> -inf
+        grad = np.dot(args[0].transpose(), - y)
     grad[1:] += lam * theta[1:]
     return grad/args[0].shape[0]
 
+# Load the training data (not included in Github -- see the note at the beginning)
 train = np.loadtxt("data/mnist_train.csv",delimiter=",")
 
 X = np.copy(train)/train.max()
@@ -53,7 +63,7 @@ m, n = X.shape
 theta_0 = np.random.randn(n)
 
 #res = minimize(logreg, theta_0, args=(X,y,1), jac=logreg_deriv, method="L-BFGS-B")
-res = minimize(logreg, theta_0, args=(X,y,1), jac=logreg_deriv, method=pmbsolve)
+res = minimize(logreg, theta_0, args=(X,y,10), jac=logreg_deriv, method=pmbsolve)
 
 # Test the predictor
 # Load the test data (not included in Github -- see the note at the beginning)
