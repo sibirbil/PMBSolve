@@ -98,7 +98,8 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
     nghist=[] # holds the history of inf. norm of derivative
     fcalls = 0  # count of function calls
     nmbs = 0  # count of total inner iterations (model building steps)
-    
+
+    tstart = time()    
     x = x_0
     f = fun(x,*args)
     fold = np.inf  # to check stopping condition
@@ -125,7 +126,7 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
     Hdiag = 1
     
     iteration = 1
-    tstart = time()
+
     while True:  # outer iterations
         # Stopping conditions
         ngf = np.max(g) # the inf-norm of the derivative vector

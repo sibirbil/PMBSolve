@@ -56,6 +56,7 @@ if (pars.history)
     output.nghist = [];
 end
 
+tstart = tic;
 x = x0;
 [f,g] = fun(x);
 output.fcalls = output.fcalls+1;
@@ -68,8 +69,8 @@ mem_start = 1;
 mem_end = 0;
 Hdiag = 1.0;
 
-iter = 1;
-tstart = tic;
+iter = 0;
+
 while(true) % Outer Iterations ---->>
 
     %% Stopping Conditions ---->>
@@ -123,9 +124,9 @@ while(true) % Outer Iterations ---->>
     end
 
     %% L-BFGS Preconditioning ---->>
-    if (iter > 1)
+    if (iter >= 1)
         [s, Hdiag, S, Y, YS, mem_start, mem_end] = ...
-            precond(g, g_old, s, Hdiag, S, Y, YS, pars.M, mem_start, mem_end);
+	  precond(g, g_old, s, Hdiag, S, Y, YS, pars.M, mem_start, mem_end);
     else
         s = -g/ngf; % Normalized steepest descent direction
     end

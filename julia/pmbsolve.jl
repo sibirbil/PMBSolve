@@ -51,6 +51,8 @@ function pmbsolve(fun, x0, pars=pars)
     output.nghist = []
   end
 
+  tstart = time()
+
   x = x0
   f,g = fun(x)
   output.fcalls += 1
@@ -64,7 +66,6 @@ function pmbsolve(fun, x0, pars=pars)
   Hdiag = 1.0
 
   iter = 1
-  tstart = time()
   while(true) # Outer Iterations ---->>
 
     # Stopping Conditions ---->>
