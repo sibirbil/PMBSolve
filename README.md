@@ -25,6 +25,4 @@ Note that the logistic regression example requires the MNIST data set. It could 
 
 ## PMBSolve for C++11
 
-_COMING SOON_
-
-A **shared-memory implementation** of ```pmbsolve``` with a large-scale **matrix factorization** example on a movie recommendation data set.
+A **shared-memory implementation** of ```pmbsolve``` with a large-scale **matrix factorization** example on a movie recommendation data set. The notebook is _coming soon_...
