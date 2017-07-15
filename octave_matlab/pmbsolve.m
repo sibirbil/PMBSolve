@@ -70,7 +70,6 @@ mem_end = 0;
 Hdiag = 1.0;
 
 iter = 0;
-
 while(true) % Outer Iterations ---->>
 
     %% Stopping Conditions ---->>

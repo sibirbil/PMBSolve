@@ -46,10 +46,10 @@ def precond(g, g_old, s, Hdiag, S, Y, YS, M, mem_start, mem_end):
 
 def pmbsolve(fun, x_0, **pars):
     """Minimize function fun starting at x_0.
-    
+
     Input
     =====
-    
+
     fun : The objective function.
           Input  : n-dimensional array x
           Output : A pair f,g where f is the function value at x (scalar)
@@ -62,11 +62,11 @@ def pmbsolve(fun, x_0, **pars):
           maxfcalls    : Maximum number of function calls; 0 for no limit (0 by default).
           maxtime      : Running time limit in seconds; 0 for no limit (0 by default).
           display      : (Boolean) Whether to print intermediate results (False by default).
-         
+
     Output
     ======
     A dictionary with the following keys.
-    
+
     x         : The solution.
     fval      : The final objective function value.
     g         : The final gradient vector.
@@ -75,9 +75,9 @@ def pmbsolve(fun, x_0, **pars):
     fcalls    : Number of function calls until convergence.
     nmbs      : Total number of model-building steps until convergence.
     time      : Total wallclock time until convergence.
-    fhist     : History of objective function values at each outer iteration. 
+    fhist     : History of objective function values at each outer iteration.
                 (if keephistory is True)
-    nghist    : History of maximum-elements of the gradient (infinite norm) at 
+    nghist    : History of maximum-elements of the gradient (infinite norm) at
                 each outer iteration. (if keephistory is True)
 
     """
@@ -86,11 +86,12 @@ def pmbsolve(fun, x_0, **pars):
     fcalls = 0  # count of function calls
     nmbs = 0  # count of total inner iterations (model building steps)
 
-    tstart = time()    
+    tstart = time()
+
     x = x_0
     f, g = fun(x)
     fcalls += 1
-    
+
     # Parameters and default values
     M = pars.get("M",5)
     maxiter = pars.get("maxiter",0)
@@ -101,7 +102,7 @@ def pmbsolve(fun, x_0, **pars):
     gtol = pars.get("gtol",1e-5)
     keephistory=pars.get("keephistory",False)
     maxtime = pars.get("maxtime",0)
-        
+
     n = len(x)
     S = np.zeros((n, M))
     Y = np.zeros((n, M))
@@ -109,9 +110,8 @@ def pmbsolve(fun, x_0, **pars):
     mem_start = 0
     mem_end = -1
     Hdiag = 1
-    
-    iteration = 1
 
+    iteration = 0
     while True:  # outer iterations
         # Stopping conditions
         ngf = np.max(g) # the inf-norm of the derivative vector
@@ -131,17 +131,17 @@ def pmbsolve(fun, x_0, **pars):
             exitcode = "Function value decreases less than ftol."
         else:
             fold = f
-        
+
         # end stopping conditions
-        
+
         if keephistory:
             fhist.append(f)
             nghist.append(ngf)
         if display:
             print('PMB - Iter: %d ===> f = %f \t norm(g) = %f\n' % (iteration, f, ngf))
-            
+
         # L-BFGS preconditioning
-        if iteration > 1:
+        if iteration >= 1:
             s, Hdiag, S, Y, YS, mem_start, mem_end = precond(g, g_old, s, Hdiag, S, Y, YS, M, mem_start, mem_end)
         else:
             s = -g/ngf
@@ -151,8 +151,8 @@ def pmbsolve(fun, x_0, **pars):
         while maxiniter==0 or initer < maxiniter:
             xt = x + s # x^k_t
             ft, gt = fun(xt) # f^k_t and g^k_t
-            fcalls += 1            
-            
+            fcalls += 1
+
             sg = np.dot(s,g)  # (v6)
             if f - ft > -1e-4*sg:
                 x = xt
@@ -166,7 +166,7 @@ def pmbsolve(fun, x_0, **pars):
             yy = np.dot(y,y) # v3
             yg = np.dot(y,g) # v4
             gg = np.dot(g,g) # v5
-            
+
             # Guess eta
             fdiff = abs(f-ft)
             if abs(sg) > 1e-8:
@@ -187,7 +187,7 @@ def pmbsolve(fun, x_0, **pars):
             s = cg*g + cs*s + cy*y  # step
             initer += 1
             # inner iterations end
-        
+
         nmbs += initer
         if maxiniter > 0 and initer >= maxiniter:
             exitcode = 'Maximum number of inner iterations (maxiniter) is reached'
@@ -204,9 +204,9 @@ def pmbsolve(fun, x_0, **pars):
         nghist.append(np.max(g))
         retdict["fhist"]=fhist
         retdict["nghist"]=nghist
-        
+
     return retdict
- 
+
 if __name__=="__main__":
     def rosenbrock(x):
         f = np.sum( 100*(x[1:]-x[:-1]**2)**2 + (x[:-1]-1)**2 )
@@ -215,7 +215,7 @@ if __name__=="__main__":
         g[0] = -400*x[0]*(x[1]-x[0]**2) + 2*(x[0]-1)
         g[-1] = 200*(x[-1] - x[-2]**2)
         return f,g
-        
+
     n = 10000
     x0 = 5.0 + np.random.rand(n)*10.0
 
@@ -226,5 +226,5 @@ if __name__=="__main__":
 
     import matplotlib.pylab as plt
     plt.semilogy(pmb_out["fhist"])
-    plt.xlabel("Iterations")    
+    plt.xlabel("Iterations")
     plt.ylabel("Objective function value")

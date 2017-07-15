@@ -49,10 +49,10 @@ def precond(g, g_old, s, Hdiag, S, Y, YS, M, mem_start, mem_end):
 
 def pmbsolve(fun, x_0, args=(), jac=None, **options):
     """Minimize function fun starting at x_0.
-    
+
     Input
     =====
-    
+
     fun(x, *args)  : The objective function.
                      Input  : n-dimensional array x, and related parameters.
                      Output : The function value at x (scalar).
@@ -61,13 +61,13 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
     jac(x, *args)  : A function that returns the gradient of the objective function.
                      Input  : n-dimensional array x, an
                      Output : The gradient at x (n-dim array).
-    
+
     options : Parameters
               ftol         : Stop when the normalized difference between two consecutive
                              function values falls below this (1e-5 by default)
               gtol         : Stop when the maximum component of the gradient falls below
-                             this (1e-5 by default). 
-              keephistory  : (Boolean) Whether to keep the function and gradient norm values at 
+                             this (1e-5 by default).
+              keephistory  : (Boolean) Whether to keep the function and gradient norm values at
                              each iteration (False by default).
               M            : The memory parameter for LBFGS preconditioning (5 by default).
               maxiter      : Maximum number of outer iterations; 0 for no limit (0 by default).
@@ -75,11 +75,11 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
               maxfcalls    : Maximum number of function calls; 0 for no limit (0 by default).
               maxtime      : Running time limit in seconds; 0 for no limit (0 by default).
               display      : (Boolean) Whether to print intermediate results (False by default).
-         
+
     Output
     ======
     An OptimizeResult object with the following attributes.
-    
+
     fun       : The final objective function value.
     jac       : The final gradient vector.
     nit       : Number of outer iterations until convergence.
@@ -88,9 +88,9 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
     nfev      : Number of function calls until convergence.
     message   : A string describing the exit condition.
     time      : Total wallclock time until convergence.
-    fhist     : History of objective function values at each outer iteration. 
+    fhist     : History of objective function values at each outer iteration.
                 (if keephistory is True)
-    nghist    : History of maximum-elements of the gradient (infinite norm) at 
+    nghist    : History of maximum-elements of the gradient (infinite norm) at
                 each outer iteration. (if keephistory is True)
 
     """
@@ -99,13 +99,14 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
     fcalls = 0  # count of function calls
     nmbs = 0  # count of total inner iterations (model building steps)
 
-    tstart = time()    
+    tstart = time()
+
     x = x_0
     f = fun(x,*args)
     fold = np.inf  # to check stopping condition
     g = jac(x,*args)
     fcalls += 1
-    
+
     # Parameters and default values
     M = options.get("M",5)
     maxiter = options.get("maxiter",0)
@@ -116,7 +117,7 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
     gtol = options.get("gtol",1e-5)
     keephistory=options.get("keephistory",False)
     maxtime = options.get("maxtime",0)
-    
+
     n = len(x)
     S = np.zeros((n, M))
     Y = np.zeros((n, M))
@@ -124,9 +125,8 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
     mem_start = 0
     mem_end = -1
     Hdiag = 1
-    
-    iteration = 1
 
+    iteration = 0
     while True:  # outer iterations
         # Stopping conditions
         ngf = np.max(g) # the inf-norm of the derivative vector
@@ -149,15 +149,15 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
         else:
             fold = f
         # end stopping conditions
-        
+
         if keephistory:
             fhist.append(f)
-            nghist.append(ngf)        
+            nghist.append(ngf)
         if display:
             print('PMB - Iter: %d ===> f = %.10f \t norm(g) = %f\n' % (iteration, f, ngf))
 
         # L-BFGS preconditioning
-        if iteration > 1:
+        if iteration >= 1:
             s, Hdiag, S, Y, YS, mem_start, mem_end = precond(g, g_old, s, Hdiag, S, Y, YS, M, mem_start, mem_end)
         else:
             s = -g/ngf
@@ -168,8 +168,8 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
             xt = x + s # x^k_t
             ft = fun(xt, *args) # f^k_t
             gt = jac(xt, *args) # g^k_t
-            fcalls += 1            
-            
+            fcalls += 1
+
             sg = np.dot(s,g)  # (v6)
             if f - ft > -1e-4*sg:
                 x = xt
@@ -183,7 +183,7 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
             yy = np.dot(y,y) # v3
             yg = np.dot(y,g) # v4
             gg = np.dot(g,g) # v5
-            
+
             # Guess eta
             fdiff = abs(f-ft)
             if abs(sg) > 1e-8:
@@ -196,7 +196,7 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
                 eta2 = 1.0
             eta = min(eta1, eta2)/(eta1+eta2)
             # end guess eta
-            
+
             sigma = 0.5*(np.sqrt(ss)*(np.sqrt(yy)+np.sqrt(gg)/eta)-ys)
             theta = (ys + 2*sigma)**2 - ss*yy
             cg = -ss/(2*sigma) # cg(sigma)
@@ -205,7 +205,7 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
             s = cg*g + cs*s + cy*y  # step
             initer += 1
             # inner iterations end
-        
+
         nmbs += initer
         if maxiniter > 0 and initer >= maxiniter:
             exitcode = 'Maximum number of inner iterations (maxiniter) is reached'
@@ -226,21 +226,21 @@ def pmbsolve(fun, x_0, args=(), jac=None, **options):
                                 message=exitcode,nit=iteration,
                                 nmbs = nmbs, time=duration)
     return retobj
-    
+
 if __name__=="__main__":
-    
+
     # Here is an example where PMB is used with SciPy minimizer.
-    
+
     # In a script, write:
     # import pmbsolve from pmb_scipy
-    
+
     from scipy.optimize import minimize
     import matplotlib.pylab as plt
-    
+
     # define the function to be minimized, and its gradient
     def rosenbrock(x, *args):
         return np.sum( 100*(x[1:]-x[:-1]**2)**2 + (x[:-1]-1)**2 )
-        
+
     def rosenbrock_der(x, *args):
         g = np.zeros(len(x))
         g[1:-1] = 200*(x[1:-1] - x[:-2]**2) - 400*(x[2:] - x[1:-1]**2)*x[1:-1] + 2*(x[1:-1]-1)
@@ -248,7 +248,7 @@ if __name__=="__main__":
         g[-1] = 200*(x[-1] - x[-2]**2)
         return g
 
-    # Initialize    
+    # Initialize
     n = 100 # dimension of the problem
     x0 = 5.0 + np.random.rand(n)*10.0
 
@@ -263,11 +263,11 @@ if __name__=="__main__":
         print("Number of function evaluations:", res.nfev)
         print("Number of iterations:", res.nit)
         print("Wallclock time:", time()-t0)
-    
+
     if minimizer == "pmb":
-        
+
         res = minimize(rosenbrock, x0, jac=rosenbrock_der, method=pmbsolve,
-                       options={"keephistory":True, "display":True})  
+                       options={"keephistory":True, "display":True})
         print(res.message)
         print("Final function value:", res.fun)
         print("Number of function evaluations:", res.nfev)
@@ -283,8 +283,8 @@ if __name__=="__main__":
         plt.xlabel("Iterations")
         plt.ylabel("Objective function value")
         plt.title("Function value")
-        
-        # The gradient norm values vs. iteration    
+
+        # The gradient norm values vs. iteration
         plt.subplot(1,2,2)
         plt.grid(True)
         plt.semilogy(res.nghist,".-")

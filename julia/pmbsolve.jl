@@ -65,7 +65,7 @@ function pmbsolve(fun, x0, pars=pars)
   mem_end = 0
   Hdiag = 1.0
 
-  iter = 1
+  iter = 0
   while(true) # Outer Iterations ---->>
 
     # Stopping Conditions ---->>
@@ -119,7 +119,7 @@ function pmbsolve(fun, x0, pars=pars)
     end
 
     # L-BFGS Preconditioning ---->>
-    if (iter > 1)
+    if (iter >= 1)
       s, Hdiag, S, Y, YS, mem_start, mem_end =
         precond(g, g_old, s, Hdiag, S, Y, YS, pars.M, mem_start, mem_end)
     else
