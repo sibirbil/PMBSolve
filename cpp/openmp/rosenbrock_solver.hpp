@@ -37,7 +37,7 @@ int main(int argc, char * argv[]) {
   //initial solution
   std::random_device r;
   std::default_random_engine eng(r());
-  std::uniform_real_distribution<> unif(0, 5);
+  std::uniform_real_distribution<> unif(5, 10);
 
   opt_prec_t* x_0 = new opt_prec_t[n];
   for (int i = 0; i < n; i++) {
