@@ -51,12 +51,11 @@ if minimizer=="lbfgs":
     print("Wallclock time:", time()-t0)
 
 if minimizer == "pmb":
-    
     res = minimize(objfun, x0, jac=objfun_deriv, method=pmbsolve,
                    options={"eta":0.01})  
     print(res.message)
     print("Final function value:", res.fun)
     print("Number of function evaluations:", res.nfev)
     print("Number of outer iterations:", res.nit)
-    print("Number of inner iterations:", res.ninnerit)
+    print("Number of inner iterations:", res.nmbs)
     print("Wallclock time:", res.time)

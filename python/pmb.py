@@ -91,7 +91,7 @@ def pmbsolve(fun, x_0, **pars):
     x = x_0
     f, g = fun(x)
     fcalls += 1
-
+    fold = np.inf # to check stopping condition
     # Parameters and default values
     M = pars.get("M",5)
     maxiter = pars.get("maxiter",0)
@@ -109,13 +109,15 @@ def pmbsolve(fun, x_0, **pars):
     YS = np.zeros(M)
     mem_start = 0
     mem_end = -1
-    Hdiag = 1
+    Hdiag = 1.0
 
     iteration = 0
     while True:  # outer iterations
         # Stopping conditions
-        ngf = np.max(g) # the inf-norm of the derivative vector
-
+        ngf = np.max(np.abs(g)) # the inf-norm of the derivative vector
+        if ngf < gtol :
+            exitcode = "First order condition is within gtol."
+            break
         if maxiter > 0 and iteration >= maxiter:
             exitcode = "Maximum number of iterations (maxiter) is reached."
             break
@@ -124,9 +126,6 @@ def pmbsolve(fun, x_0, **pars):
             break
         if maxtime > 0 and time()-tstart >= maxtime:
             exitcode = "Maximum time limit (maxtime) is reached."
-        if ngf < gtol :
-            exitcode = "First order condition is within gtol."
-            break
         if iteration>1 and (fold-f)/max(abs(fold), abs(f), 1) < ftol:
             exitcode = "Function value decreases less than ftol."
         else:
@@ -147,21 +146,26 @@ def pmbsolve(fun, x_0, **pars):
             s = -g/ngf
         g_old = np.copy(g)
         # end L-BFGS preconditioning
+
         initer = 0
         while maxiniter==0 or initer < maxiniter:
             xt = x + s # x^k_t
+
             ft, gt = fun(xt) # f^k_t and g^k_t
             fcalls += 1
 
             sg = np.dot(s,g)  # (v6)
-            if f - ft > -1e-4*sg:
+
+            if f - ft > -1.0e-4*sg:
                 x = xt
                 f = ft
                 g = gt
                 break
+
             sgt = np.dot(s,gt)
+
             y = gt - g  # y^k_t
-            ys = np.dot(y,s) # v1
+            ys = sgt - s # v1 np.dot(y,s)
             ss = np.dot(s,s) # v2
             yy = np.dot(y,y) # v3
             yg = np.dot(y,g) # v4
@@ -169,11 +173,11 @@ def pmbsolve(fun, x_0, **pars):
 
             # Guess eta
             fdiff = abs(f-ft)
-            if abs(sg) > 1e-8:
+            if abs(sg) > 1.0e-8:
                 eta1 = fdiff/abs(sg)
             else:
                 eta1 = 1.0
-            if abs(sgt) > 1e-8:
+            if abs(sgt) > 1.0e-8:
                 eta2 = fdiff/abs(sgt)
             else:
                 eta2 = 1.0
@@ -181,21 +185,29 @@ def pmbsolve(fun, x_0, **pars):
                 eta = max(eta1, eta2)/(eta1 + eta2)
             else:
                 eta = min(eta1, eta2)/(eta1 + eta2)
+
             # end guess eta
             sigma = 0.5*(np.sqrt(ss)*(np.sqrt(yy)+np.sqrt(gg)/eta)-ys)
-            theta = (ys + 2*sigma)**2 - ss*yy
-            cg = -ss/(2*sigma) # cg(sigma)
-            cs = cg/theta*(-(ys + 2*sigma)*yg+yy*sg) # cs(sigma)
-            cy = cg/theta*(-(ys + 2*sigma)*sg+ss*yg) # cy(sigma)
+            theta = (ys + 2.0*sigma)**2.0 - ss*yy
+
+            cg = -ss/(2.0*sigma) # cg(sigma)
+            cs = cg/theta*(-(ys + 2.0*sigma)*yg+yy*sg) # cs(sigma)
+            cy = cg/theta*(-(ys + 2.0*sigma)*sg+ss*yg) # cy(sigma)
+
             s = cg*g + cs*s + cy*y  # step
+
             initer += 1
+            
             # inner iterations end
 
         nmbs += initer
+
         if maxiniter > 0 and initer >= maxiniter:
             exitcode = 'Maximum number of inner iterations (maxiniter) is reached'
             break
+
         iteration += 1
+
     # outer iterations end
 
     duration = time()-tstart
