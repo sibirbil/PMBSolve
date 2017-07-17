@@ -18,9 +18,9 @@ using namespace std;
 
 template<class Func>
 void pmb_driver(opt_prec_t* x_0, Options& pars, Output*& output,  Func& func) {
-  
+
         int n = func.n;
-	output = new Output(n, pars.maxiter);
+        output = new Output(n, pars.maxiter);
 
         opt_prec_t* x = new opt_prec_t[n];
         opt_prec_t* g = new opt_prec_t[n];
@@ -37,12 +37,12 @@ void pmb_driver(opt_prec_t* x_0, Options& pars, Output*& output,  Func& func) {
         int* ind = new int[pars.M];
 
         opt_prec_t ys = 1.0, yy = 1.0, ss = 1.0, yg = 1.0, sg = 1.0, gg = 1.0, cg, f,
-	  fold = (std::numeric_limits<opt_prec_t>::max)(), 
-	  ft, Hdiag;
+                   fold = (std::numeric_limits<opt_prec_t>::max)(),
+                   ft, Hdiag;
         int evals = 0, iter = 0, mem_end = 0, mem_start = 1;
 
-	double startTime = omp_get_wtime();
-	
+        double startTime = omp_get_wtime();
+
 #pragma omp parallel for schedule(static)
         for(int k = 0; k < n; k++) {
                 x[k] = x_0[k];
@@ -60,7 +60,7 @@ void pmb_driver(opt_prec_t* x_0, Options& pars, Output*& output,  Func& func) {
         memset(YS, 0, (pars.M *sizeof(opt_prec_t)));
 
         func(x, f, g);
-	evals++;
+        evals++;
 
         while (true) {
                 opt_prec_t ngf = fabs(g[0]);
@@ -69,65 +69,65 @@ void pmb_driver(opt_prec_t* x_0, Options& pars, Output*& output,  Func& func) {
                 }
 
                 if (ngf < pars.gtol) {
-		  output->exit = 1;
-		  if(pars.message) {
-		    printf("First order condition is within gtol\n");     
-		  }
-		  break;
+                        output->exit = 1;
+                        if(pars.message) {
+                                printf("First order condition is within gtol\n");
+                        }
+                        break;
                 }
 
-		if(iter >= pars.maxiter) {
-		  output->exit = -1;
-		  if(pars.message) {
-		    printf("Maximum number of iterations (maxiter) is reached\n");     
-		  }
-		  break;
-		}
+                if(iter >= pars.maxiter) {
+                        output->exit = -1;
+                        if(pars.message) {
+                                printf("Maximum number of iterations (maxiter) is reached\n");
+                        }
+                        break;
+                }
 
-		if(evals >= pars.maxfcalls) {
-		  output->exit = -2;
-		  if(pars.message) {
-		    printf("Maximum number of function calss (maxfcalls) is reached\n");     
-		  }
-		  break;
-		}
-		
-		if(omp_get_wtime() - startTime > pars.maxtime) {
-		  output->exit = -3;
-		  if(pars.message) {
-		    printf("Maximum time limit (maxtime) is reached\n");     
-		  }
-		  break;
-		}
+                if(evals >= pars.maxfcalls) {
+                        output->exit = -2;
+                        if(pars.message) {
+                                printf("Maximum number of function calss (maxfcalls) is reached\n");
+                        }
+                        break;
+                }
 
-		if((fold - f)/max(max(fabs(fold), fabs(f)), 1.0f) < pars.ftol) {
-		  output->exit = -4;
-		  if(pars.message) {
-		    printf("Function value decreases less than ftol");     
-		  }
-		  break;
-		}
-		
-		if(pars.history) {
-		  output->fhist[iter] = f;
-		  output->nghist[iter] = ngf;
-		}
+                if(omp_get_wtime() - startTime > pars.maxtime) {
+                        output->exit = -3;
+                        if(pars.message) {
+                                printf("Maximum time limit (maxtime) is reached\n");
+                        }
+                        break;
+                }
 
-		if (pars.display){
-		  printf("Iter: %d ===> f = %f \t norm(g) = %f\n", iter+1, f, ngf);
-		}
+                if((fold - f)/max(max(fabs(fold), fabs(f)), 1.0f) < pars.ftol) {
+                        output->exit = -4;
+                        if(pars.message) {
+                                printf("Function value decreases less than ftol");
+                        }
+                        break;
+                }
 
-		if(iter > 1) {
-		  precond(s, y, g, g_old,
-			  Hdiag, mem_start, mem_end, ind,
-			  S, Y, YS, al, be, n, pars.M, iter);
-		} else {
+                if(pars.history) {
+                        output->fhist[iter] = f;
+                        output->nghist[iter] = ngf;
+                }
+
+                if (pars.display) {
+                        printf("Iter: %d ===> f = %f \t norm(g) = %f\n", iter+1, f, ngf);
+                }
+
+                if(iter > 1) {
+                        precond(s, y, g, g_old,
+                                Hdiag, mem_start, mem_end, ind,
+                                S, Y, YS, al, be, n, pars.M, iter);
+                } else {
 #pragma omp parallel for schedule(static)
-		  for(int k = 0; k < n; k++) {
-		    s[k] = -g[k]/ngf;
-		  }
-		} 
-		 
+                        for(int k = 0; k < n; k++) {
+                                s[k] = -g[k]/ngf;
+                        }
+                }
+
 
 #pragma omp parallel for schedule(static)
                 for(int k = 0; k < n; k++) {
@@ -164,19 +164,24 @@ void pmb_driver(opt_prec_t* x_0, Options& pars, Output*& output,  Func& func) {
                         }
 
                         opt_prec_t eta, eta1, eta2;
-			opt_prec_t fdiff = fabs(f - ft);
-			if (fabs(sg) > 1.0e-8) {
-			  eta1 = fdiff/fabs(sg);
-			} else {
-			  eta1 = 1.0;
-			}
-			opt_prec_t sgt = ys + sg;
-			if (fabs(sgt) > 1.0e-8) {
-			  eta2 = fdiff/fabs(sgt);
-			} else {
-			  eta2 = 1.0;
-			}
-			eta = min(eta1, eta2)/(eta1 + eta2);
+                        opt_prec_t fdiff = fabs(f - ft);
+                        if (fabs(sg) > 1.0e-8) {
+                                eta1 = fdiff/fabs(sg);
+                        } else {
+                                eta1 = 1.0;
+                        }
+                        opt_prec_t sgt = ys + sg;
+                        if (fabs(sgt) > 1.0e-8) {
+                                eta2 = fdiff/fabs(sgt);
+                        } else {
+                                eta2 = 1.0;
+                        }
+                        if (-sgt < sg) {
+                                eta = max(eta1, eta2)/(eta1 + eta2);
+                        } else {
+                                eta = min(eta1, eta2)/(eta1 + eta2);
+                        }
+
 
                         opt_prec_t sigma = 0.5 * (sqrt(ss) * (sqrt(yy) + 1.0 / eta * sqrt(gg)) - ys);
                         opt_prec_t theta = pow((ys + 2.0 * sigma), 2.0) - (ss * yy);
@@ -187,30 +192,30 @@ void pmb_driver(opt_prec_t* x_0, Options& pars, Output*& output,  Func& func) {
 
 #pragma omp parallel for schedule(static)
                         for (int k = 0; k < n; k++) {
-			  s[k] = g[k] * cg + s[k] * cs + y[k] * cy;
-			}
+                                s[k] = g[k] * cg + s[k] * cs + y[k] * cy;
+                        }
                         initer++;
                 }
-		output->nmbs += initer;
+                output->nmbs += initer;
 
                 if (initer >= pars.maxinneriter) {
-		  output->exit = 0;
-		  if (pars.message) {
-		    printf("Maximum number of inner iterations (maxiniter) is reached\n");
-		  }
-		  break;
+                        output->exit = 0;
+                        if (pars.message) {
+                                printf("Maximum number of inner iterations (maxiniter) is reached\n");
+                        }
+                        break;
                 }
-		iter++;
+                iter++;
         }
 
-	output->time = omp_get_wtime() - startTime;
-	for (int k = 0; k < n; k++) {  
-	  output->g[k] = g[k];
-	  output->x[k] = x[k];
-	}
+        output->time = omp_get_wtime() - startTime;
+        for (int k = 0; k < n; k++) {
+                output->g[k] = g[k];
+                output->x[k] = x[k];
+        }
         output->fval = f;
         output->niter = iter;
-	output->fcalls = evals;
+        output->fcalls = evals;
 
         delete[] x;
         delete[] g;

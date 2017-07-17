@@ -177,7 +177,10 @@ def pmbsolve(fun, x_0, **pars):
                 eta2 = fdiff/abs(sgt)
             else:
                 eta2 = 1.0
-            eta = min(eta1, eta2)/(eta1+eta2)
+            if (-sgt < sg):
+                eta = max(eta1, eta2)/(eta1 + eta2)
+            else:
+                eta = min(eta1, eta2)/(eta1 + eta2)
             # end guess eta
             sigma = 0.5*(np.sqrt(ss)*(np.sqrt(yy)+np.sqrt(gg)/eta)-ys)
             theta = (ys + 2*sigma)**2 - ss*yy

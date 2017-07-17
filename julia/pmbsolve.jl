@@ -165,8 +165,12 @@ function pmbsolve(fun, x0, pars=pars)
         eta2 = fdiff/abs(sgt)
       else
         eta2 = 1.0
-        end
-      eta = min(eta1, eta2)/(eta1 + eta2)
+      end
+      if (-sgt < sg)
+          eta = max(eta1, eta2)/(eta1 + eta2)
+      else
+          eta = min(eta1, eta2)/(eta1 + eta2)
+      end
       # <<---- Guess eta
 
       sigma = 1.0/2.0*(sqrt(ss)*(sqrt(yy)+1.0/eta*sqrt(gg))-ys)
