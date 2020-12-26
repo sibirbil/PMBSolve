@@ -165,7 +165,7 @@ def pmbsolve(fun, x_0, **pars):
             sgt = np.dot(s,gt)
 
             y = gt - g  # y^k_t
-            ys = sgt - s # v1 np.dot(y,s)
+            ys = sgt - sg # v1 np.dot(y,s)
             ss = np.dot(s,s) # v2
             yy = np.dot(y,y) # v3
             yg = np.dot(y,g) # v4
